@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDL Trend Report | 물류센터 이슈 대응을 위한 AI 적용 전략</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        
+        :root {
+            /* LX 그룹 레드 컬러 계열 */
+            --primary-gradient: linear-gradient(135deg, #C8102E 0%, #8B0000 100%);
+            --secondary-gradient: linear-gradient(135deg, #FF4444 0%, #C8102E 100%);
+            --accent-gradient: linear-gradient(135deg, #E63946 0%, #A4161A 100%);
+            --dark-bg: #1a0505;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(200, 16, 46, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --shadow-soft: 0 8px 32px 0 rgba(200, 16, 46, 0.37);
+            --lx-red: #C8102E;
+            --lx-dark-red: #8B0000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #1a0505, #2d0a0a, #1f0808);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        
+        /* 애니메이션 배경 */
+        .animated-background {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .shape1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-gradient);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        
+        .shape2 {
+            width: 350px;
+            height: 350px;
+            background: var(--secondary-gradient);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 5s;
+        }
+        
+        .shape3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-gradient);
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(100px, -100px) rotate(120deg); }
+            66% { transform: translate(-100px, 100px) rotate(240deg); }
+        }
+        
+        /* 헤더 - 글래스모피즘 */
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-soft);
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(200, 16, 46, 0.5);
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 5%;
+        }
+        
+        /* 히어로 섹션 */
+        .hero {
+            text-align: center;
+            padding: 5rem 0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff, #C8102E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+        }
+        
+        /* 글래스모피즘 카드 */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px 0 rgba(200, 16, 46, 0.5);
+            border-color: rgba(200, 16, 46, 0.6);
+        }
+        
+        /* 섹션 타이틀 */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .section-icon {
+            font-size: 2.5rem;
+        }
+        
+        /* 타임라인 (AI 발전사) */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            justify-content: flex-start;
+            padding: 2rem 0;
+            position: relative;
+            animation: fadeInLeft 0.8s ease-out;
+        }
+        
+        .timeline-item:nth-child(even) {
+            justify-content: flex-end;
+            animation: fadeInRight 0.8s ease-out;
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                transform: translateX(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .timeline-content {
+            width: 45%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .timeline-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(200, 16, 46, 0.4);
+        }
+        
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            border: 4px solid var(--dark-bg);
+            z-index: 1;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            right: -60px;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -60px;
+        }
+        
+        .timeline-stage {
+            display: inline-block;
+            background: var(--primary-gradient);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .timeline-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .timeline-content.active .timeline-details {
+            max-height: 500px;
+            margin-top: 1rem;
+        }
+        
+        /* 비교 테이블 */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .comparison-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .comparison-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(200, 16, 46, 0.4);
+        }
+        
+        .comparison-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .comparison-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .comparison-section h4 {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .comparison-section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        /* 시나리오 그리드 */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .scenario-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .scenario-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .scenario-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(200, 16, 46, 0.4);
+        }
+        
+        .scenario-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .scenario-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .scenario-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .scenario-card.active .scenario-details {
+            max-height: 1000px;
+            margin-top: 1.5rem;
+        }
+        
+        .scenario-section {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 3px solid rgba(200, 16, 46, 0.5);
+        }
+        
+        .scenario-section h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #C8102E;
+        }
+        
+        /* 체크리스트 */
+        .checklist {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .checklist-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .checklist-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 40px rgba(200, 16, 46, 0.3);
+        }
+        
+        .checklist-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+        
+        .checklist-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 퀴즈 섹션 */
+        .quiz-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .quiz-question {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        
+        .quiz-options {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .quiz-option:hover {
+            background: rgba(200, 16, 46, 0.2);
+            border-color: #C8102E;
+            transform: translateX(10px);
+        }
+        
+        .quiz-option.selected {
+            background: var(--primary-gradient);
+            border-color: transparent;
+        }
+        
+        .quiz-option.correct {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border-color: transparent;
+        }
+        
+        .quiz-option.incorrect {
+            background: linear-gradient(135deg, #8B0000, #C8102E);
+            border-color: transparent;
+        }
+        
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(200, 16, 46, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(200, 16, 46, 0.6);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quiz-progress {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .quiz-result {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .quiz-result h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-score {
+            font-size: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 3rem 5%;
+            text-align: center;
+            margin-top: 5rem;
+        }
+        
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                justify-content: flex-start;
+                padding-left: 80px;
+            }
+            
+            .timeline-content {
+                width: 100%;
+            }
+            
+            .timeline-item:nth-child(odd) .timeline-content::before,
+            .timeline-item:nth-child(even) .timeline-content::before {
+                left: -60px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
+        /* 스크롤 애니메이션 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 애니메이션 배경 -->
+    <div class="animated-background">
+        <div class="floating-shape shape1"></div>
+        <div class="floating-shape shape2"></div>
+        <div class="floating-shape shape3"></div>
+    </div>
+
+    <!-- 헤더 -->
+    <header>
+        <div class="header-content">
+            <div class="logo">📊 TDL Trend Report</div>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span>👤</span>
+                    <span>CL컨설팅담당</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+        <!-- 히어로 섹션 -->
+        <section class="hero">
+            <h1>물류센터 이슈 대응을 위한<br>AI 적용 전략 가이드</h1>
+            <p class="hero-subtitle">생성형 AI와 Agentic AI | 3PL 물류센터 이슈 대응 적용 가이드</p>
+        </section>
+
+        <!-- AI 발전사 -->
+        <section class="glass-card fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">🚀</span>
+                AI 발전사: 규칙 기반 자동화에서 이해·추론·행동으로의 발전
+            </h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-secondary);">
+                AI는 단순한 자동화 도구에서 출발하여, 데이터를 이해하고 문맥을 해석하며 나아가 행동까지 연결하는 방향으로 발전해 왔습니다. 각 단계를 클릭하여 상세 내용을 확인하세요.
+            </p>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content" onclick="this.classList.toggle('active')">
+                        <span class="timeline-stage">단계 0: 규칙 기반 (If-Then)</span>
+                        <h3>정해진 질문에만 정해진 답</h3>
+                        <div class="timeline-details">
+                            <p><strong>예시:</strong> 고객센터 자동응답 시스템에서 "배송 조회는 1번, 반품 문의는 2번"과 같이 사용자의 입력에 따라 정해진 답변을 제공하는 방식입니다.</p>
+                            <p><strong>한계:</strong> 질문의 표현이 조금만 달라지거나 복합적인 상황이 발생하면 대응하지 못했습니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content" onclick="this.classList.toggle('active')">
+                        <span class="timeline-stage">단계 1: 통계적 머신러닝</span>
+                        <h3>확률적 분류는 가능하지만, 이유 설명은 약함</h3>
+                        <div class="timeline-details">
+                            <p><strong>예시:</strong> 스팸메일 필터가 대표적입니다. 특정 단어, 발신자 특성, 과거 패턴을 학습하여 메일이 스팸인지 아닌지를 분류합니다.</p>
+                            <p><strong>한계:</strong> 왜 그러한 예측 결과가 나왔는지를 사람이 이해하기 쉽게 설명하는 데에는 한계가 있었습니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content" onclick="this.classList.toggle('active')">
+                        <span class="timeline-stage">단계 2: 딥러닝</span>
+                        <h3>사람이 특징을 설계하지 않아도 인식 급격히 향상</h3>
+                        <div class="timeline-details">
+                            <p><strong>예시:</strong> 스마트폰 사진 앱이 사람, 강아지, 고양이, 음식 사진을 자동으로 구분하는 기능이나, 음성을 텍스트로 전환하는 음성인식 기능이 이에 해당합니다.</p>
+                            <p><strong>한계:</strong> "왜 그렇게 판단하였는가"를 자연어로 설명하거나, 여러 조건을 한꺼번에 고려하여 복합적인 상황을 처리하는 데에는 한계가 있었습니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content" onclick="this.classList.toggle('active')">
+                        <span class="timeline-stage">단계 3: 트랜스포머/대규모 사전학습</span>
+                        <h3>언어 이해·요약·작성 자체가 제품으로 자리잡음</h3>
+                        <div class="timeline-details">
+                            <p><strong>예시:</strong> 긴 글을 붙여 넣고 "핵심만 5줄로 요약해줘"라고 요청하면 맥락을 파악해 요약을 생성하고, "요약 후 표로 정리해줘" 같은 복합 지시도 따라갔습니다.</p>
+                            <p><strong>한계:</strong> 답변이 자연스럽고 설득력 있어 보여도 사실과 다르거나, 입력 조건이 조금만 바뀌면 결과의 일관성이 흔들리는 문제가 존재했습니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content" onclick="this.classList.toggle('active')">
+                        <span class="timeline-stage">단계 4: 정렬 (Alignment: RLHF 등)</span>
+                        <h3>지시를 더 잘 따르고, 대화 품질이 안정됨</h3>
+                        <div class="timeline-details">
+                            <p><strong>예시:</strong> "핵심만, 불릿 5개, 이모지 없이"처럼 형식을 지정하면 그 형식을 더 잘 따르고, "어린아이도 이해할 수 있게 설명해 달라"는 요구에 맞춰 표현을 조정하는 것이 가능해졌습니다.</p>
+                            <p><strong>의미:</strong> '말을 잘한다'에서 '사용자 지시를 제대로 수행한다'로 진화한 단계입니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content" onclick="this.classList.toggle('active')">
+                        <span class="timeline-stage">단계 5: 멀티모달</span>
+                        <h3>텍스트+이미지/표/문서를 함께 읽고 추론</h3>
+                        <div class="timeline-details">
+                            <p><strong>예시:</strong> 제품 사진과 불량 설명을 함께 제시하면, AI가 이를 종합하여 문제를 해석하는 것이 가능해졌습니다.</p>
+                            <p><strong>의미:</strong> 복잡한 상황은 대부분 하나의 데이터만으로 설명되지 않고, 여러 종류의 정보를 동시에 확인해야 하기 때문에 실제 운영에서 매우 중요합니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content" onclick="this.classList.toggle('active')">
+                        <span class="timeline-stage">단계 6: 도구 사용 (Tool use) · 에이전트</span>
+                        <h3>답변을 넘어, 단계적으로 '행동'을 실행</h3>
+                        <div class="timeline-details">
+                            <p><strong>예시:</strong> "다음 주말에 친구들과 만나기로 했으니 식당 후보를 정리하고, 일정표를 만들고, 문자 초안까지 준비해 달라"는 요청에 대해 AI가 단순 추천에 그치지 않고 후보를 분류하고, 일정 순서를 잡고, 공유용 문구까지 만들어주는 것이 가능합니다.</p>
+                            <p><strong>의미:</strong> 물류에서는 "무슨 일이 발생하였는가"보다 "그래서 지금 무엇을 해야 하는가"가 더 중요하기 때문에 이 단계가 특히 중요합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(200, 16, 46, 0.1); border-radius: 15px; border-left: 4px solid #C8102E;">
+                <h3 style="margin-bottom: 1rem;">💡 핵심 요약</h3>
+                <p>AI는 <strong>규칙 기반 자동화 → 확률적 예측과 분류 → 인식 고도화 → 언어 이해와 재구성 → 지시 수행 안정화 → 멀티모달 통합 이해 → 도구 기반 실행</strong>의 방향으로 발전해 왔습니다.</p>
+                <p style="margin-top: 1rem;">이러한 발전은 AI가 더 이상 단순히 반복 업무를 자동화하는 수준에 머무르지 않고, <strong>복잡한 운영 상황에서 정보를 해석하고, 이슈를 구조화하며, 필요한 행동까지 연결할 수 있는 단계</strong>로 나아가고 있음을 보여줍니다.</p>
+            </div>
+        </section>
+
+        <!-- 생성형 AI vs Agentic AI -->
+        <section class="glass-card fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">⚡</span>
+                생성형 AI와 Agentic AI: 같은 기반 위의 상이한 역할
+            </h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-secondary);">
+                두 기술 모두 언어모델 기반 AI라는 공통점을 가지고 있으나, 그 역할과 가치 창출 방식에는 분명한 차이가 있습니다.
+            </p>
+
+            <div class="comparison-container">
+                <div class="comparison-card">
+                    <h3>🤖 생성형 AI</h3>
+                    
+                    <div class="comparison-section">
+                        <h4>핵심 역할</h4>
+                        <p>콘텐츠 생성 및 재구성</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>주요 작업</h4>
+                        <p>쓰기, 요약, 정리, 분류, 설명</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>강점</h4>
+                        <p>비정형 정보 구조화, 대량 언어 작업 처리, 멀티모달 이해</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>약점</h4>
+                        <p>사실성 검증 필요, 일관성 흔들림 가능</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>가치</h4>
+                        <p>정보 정리·설명·커뮤니케이션 비용 절감</p>
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <h3>🚀 Agentic AI</h3>
+                    
+                    <div class="comparison-section">
+                        <h4>핵심 역할</h4>
+                        <p>목표 달성을 위한 자율 실행</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>주요 작업</h4>
+                        <p>계획, 도구 사용, 실행, 검증, 반복</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>강점</h4>
+                        <p>워크플로우 자동화, 업무 진척 관리</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>약점</h4>
+                        <p>오조치 리스크, 보안 취약점, 복잡한 통제 필요</p>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h4>가치</h4>
+                        <p>이슈 대응 워크플로우 병목 해소</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(200, 16, 46, 0.1); border-radius: 15px;">
+                <h3 style="margin-bottom: 1rem;">🔄 핵심 차이점과 상호보완 관계</h3>
+                <p style="margin-bottom: 1rem;">생성형 AI와 Agentic AI의 가장 중요한 차이는 <strong>'정보를 다루는 방식'</strong>에 있습니다.</p>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li style="margin-bottom: 0.8rem;">• <strong>생성형 AI:</strong> "무슨 일이 일어났는가"를 정리 → 정보의 구조화와 설명</li>
+                    <li style="margin-bottom: 0.8rem;">• <strong>Agentic AI:</strong> "그다음에 무엇을 해야 하는가"를 실행 → 업무 흐름의 연결과 진행</li>
+                </ul>
+                <p style="margin-top: 1rem;">결국 물류센터의 이슈 대응에서 두 AI는 <strong>순차적으로 협력</strong>하는 구조로 이해해야 합니다.</p>
+            </div>
+        </section>
+
+        <!-- 물류에서의 의미 -->
+        <section class="glass-card fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">⚠️</span>
+                물류에서의 의미: 왜 이슈 대응에 AI를 도입해야 하는가
+            </h2>
+            
+            <div style="margin-bottom: 3rem;">
+                <h3 style="font-size: 1.8rem; margin-bottom: 1.5rem;">이슈 대응이 3PL 경쟁력을 좌우한다</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary);">
+                    3PL 물류센터의 경쟁력을 평균 처리량이나 자동화 설비 수준만으로 평가하는 데에는 분명한 한계가 있습니다. 실제로 고객 경험과 손익, 서비스 신뢰도를 좌우하는 것은 대체로 <strong>이슈 상황</strong>입니다.
+                </p>
+            </div>
+
+            <div style="display: grid; gap: 1.5rem; margin-bottom: 3rem;">
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 15px; border-left: 4px solid #C8102E;">
+                    <h4 style="margin-bottom: 0.5rem;">📥 입고 단계</h4>
+                    <p>ASN과 실제 품목, 수량, LOT, 유통 기한이 일치하지 않으면 이후 재고 정확도 전체가 흔들릴 수 있습니다.</p>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 15px; border-left: 4px solid #8B0000;">
+                    <h4 style="margin-bottom: 0.5rem;">📦 재고 단계</h4>
+                    <p>재고 차이가 발생하면 피킹 오류, 긴급 보충, 출고 지연으로 이어질 수 있습니다.</p>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 15px; border-left: 4px solid #FF4444;">
+                    <h4 style="margin-bottom: 0.5rem;">📤 출고 단계</h4>
+                    <p>오피킹이나 라벨 오류, 도크 혼잡이 발생하면 SLA 위반과 클레임, 재배송 비용 증가로 연결됩니다.</p>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 15px; border-left: 4px solid #E63946;">
+                    <h4 style="margin-bottom: 0.5rem;">🔙 반품 단계</h4>
+                    <p>상태 판정이 지연될수록 재고 재투입이 늦어지고, 폐기나 환불 판단 오류는 직접적인 비용 손실과 분쟁을 유발합니다.</p>
+                </div>
+            </div>
+
+            <div class="comparison-container">
+                <div style="background: rgba(255, 99, 132, 0.1); padding: 2rem; border-radius: 15px;">
+                    <h3 style="color: #ff6384; margin-bottom: 1.5rem;">🔴 이슈 대응의 특징</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 0.8rem;">• 처리 시간이 정상 업무보다 훨씬 길다</li>
+                        <li style="margin-bottom: 0.8rem;">• 담당 부서와 이해관계자가 늘어난다</li>
+                        <li style="margin-bottom: 0.8rem;">• 판단과 승인 및 증빙이 필요하다</li>
+                        <li style="margin-bottom: 0.8rem;">• 지연이 연쇄적으로 확산된다</li>
+                        <li style="margin-bottom: 0.8rem;">• SLA 위반·클레임·정산 분쟁으로 이어진다</li>
+                        <li>• 담당자의 경험과 숙련 수준에 따라 대응 속도와 품질이 달라진다</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(200, 16, 46, 0.1); padding: 2rem; border-radius: 15px;">
+                    <h3 style="color: #C8102E; margin-bottom: 1.5rem;">🔵 AI 적용의 핵심 관점</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 0.8rem;">• 예외는 '종류'가 아닌 <strong>영향(원가·서비스·리스크) 관점</strong>에서 평가</li>
+                        <li style="margin-bottom: 0.8rem;">• AI는 단순 분류기가 아닌 <strong>증빙 정리·상황 요약·의사결정 보조 도구</strong></li>
+                        <li style="margin-bottom: 0.8rem;">• 이슈 대응은 <strong>자원 재배치와 우선순위 변경</strong>을 동반</li>
+                        <li style="margin-bottom: 0.8rem;">• <strong>동적 운영</strong>이 전제되어야 함</li>
+                        <li style="margin-bottom: 0.8rem;">• 완전 자동화가 아닌 <strong>통제 가능한 자동화</strong>부터 시작</li>
+                        <li>• <strong>정책·데이터·프로세스 구조화</strong>가 모델 성능보다 중요</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(200, 16, 46, 0.1); border-radius: 15px; border-left: 4px solid #C8102E;">
+                <h3 style="margin-bottom: 1rem;">💡 결론</h3>
+                <p>3PL 물류센터에서 AI는 정상 프로세스의 추가 효율화보다 <strong>이슈 대응의 일관성·속도·재현성을 높이는 방향</strong>에서 비즈니스 가치를 만들 가능성이 높습니다.</p>
+            </div>
+        </section>
+
+        <!-- Trigger-Action-Guardrail 프레임워크 -->
+        <section class="glass-card fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">🎯</span>
+                Trigger-Action-Guardrail 프레임워크
+            </h2>
+
+            <div style="display: grid; gap: 2rem; margin-top: 2rem;">
+                <div style="background: rgba(200, 16, 46, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #C8102E;">
+                    <h3 style="margin-bottom: 1rem;">🎯 Trigger</h3>
+                    <p style="margin-bottom: 1rem;"><strong>의미:</strong> AI 개입을 시작하는 조건과 신호</p>
+                    <p style="margin-bottom: 1rem;"><strong>필요성:</strong> 트리거는 워크플로우 자동화의 시작점입니다. 특정 이벤트나 패턴이 감지되면 AI 시스템이 자동으로 활성화되어 실시간으로 대응할 수 있습니다.</p>
+                    <p><strong>예시:</strong></p>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>시스템 이벤트 기반 (재고 음수 발생, 스캔 불일치)</li>
+                        <li>임계값 초과 (Cycle Count 오차, 도크 대기 차량 증가)</li>
+                        <li>패턴 감지 (반복적 오피킹, 특정 SKU 보충 실패)</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(255, 68, 68, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #FF4444;">
+                    <h3 style="margin-bottom: 1rem;">⚡ Action</h3>
+                    <p style="margin-bottom: 1rem;"><strong>의미:</strong> 트리거 발생 시 자동 수행 작업</p>
+                    <p style="margin-bottom: 1rem;"><strong>필요성:</strong> 액션은 AI의 실제 가치를 만들어내는 단계입니다. 생성형 AI는 정보를 정리하고, 에이전트 AI는 시스템을 직접 조작하여 업무를 진행시킵니다.</p>
+                    <p><strong>예시:</strong></p>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>생성형 AI: 증빙 구성, 분석, 요약</li>
+                        <li>Agentic AI: 태스크 생성, 승인 요청, 우선순위 조정</li>
+                        <li>시스템 연계: WMS/TMS 업데이트, 알림 발송</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(230, 57, 70, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #E63946;">
+                    <h3 style="margin-bottom: 1rem;">🛡️ Guardrail</h3>
+                    <p style="margin-bottom: 1rem;"><strong>의미:</strong> AI 행동의 경계와 안전장치</p>
+                    <p style="margin-bottom: 1rem;"><strong>필요성:</strong> 가드레일은 AI의 자율성과 안전성 사이의 균형을 맞춥니다. 고위험 작업은 자동 실행을 차단하고 승인을 요구하여 오조치 리스크를 통제합니다.</p>
+                    <p><strong>예시:</strong></p>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>자동 실행 금지 조건 (재고조정, 폐기 확정)</li>
+                        <li>승인 필수 항목 (비용 발생 조치, 정산 영향)</li>
+                        <li>감사 로그 및 추적성 확보</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(255, 193, 7, 0.1); border-radius: 15px; border-left: 4px solid #ffc107;">
+                <h3 style="margin-bottom: 1rem;">❓ 왜 이렇게 구성해야 하는가?</h3>
+                <p>3PL 환경에서는 화주별 정책·SLA·정산 조건이 다르고, 동일한 이슈라도 정답이 하나가 아닙니다. 따라서 AI 도입은 모델 성능보다 <strong>개입 조건(Trigger), 자동 조치 범위(Action), 통제 구조(Guardrail)의 선행 정의</strong>가 성패를 좌우합니다.</p>
+            </div>
+        </section>
+
+        <!-- 물류센터 이슈 대응 시나리오 -->
+        <section class="glass-card fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">💡</span>
+                물류센터 이슈 대응 시나리오
+            </h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-secondary);">
+                각 카드를 클릭하여 상세 내용을 확인하세요.
+            </p>
+
+            <div class="scenario-grid">
+                <div class="scenario-card" onclick="this.classList.toggle('active')">
+                    <div class="scenario-icon">📥</div>
+                    <div class="scenario-title">입고 불일치</div>
+                    <p style="color: var(--text-secondary);">ASN 대비 실물 불일치, 바코드 이슈</p>
+                    
+                    <div class="scenario-details">
+                        <div class="scenario-section">
+                            <h4>🎯 Trigger</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>사전 입고정보(ASN) 대비 실물 불일치</li>
+                                <li>바코드 미인식, 라벨 규격 상이</li>
+                                <li>포장 파손으로 정상 검수 불가</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>⚡ Action</h4>
+                            <p><strong>생성형 AI:</strong></p>
+                            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                                <li>불일치 유형 표준 분류</li>
+                                <li>증빙 자료 자동 구성</li>
+                                <li>판단 지원 요약 제공</li>
+                            </ul>
+                            <p><strong>Agentic AI:</strong></p>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>검수 작업 자동 생성</li>
+                                <li>임시 보류 위치 지정</li>
+                                <li>추가 정보 요청 흐름 연결</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>🛡️ Guardrail</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>비용 발생 조치는 자동 확정 금지</li>
+                                <li>유통기한 위반 가능 조치는 자동 진행 불가</li>
+                                <li>기본값은 보수적 보류 처리</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scenario-card" onclick="this.classList.toggle('active')">
+                    <div class="scenario-icon">📦</div>
+                    <div class="scenario-title">재고 차이</div>
+                    <p style="color: var(--text-secondary);">위치 재고 음수, Cycle Count 오차</p>
+                    
+                    <div class="scenario-details">
+                        <div class="scenario-section">
+                            <h4>🎯 Trigger</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>위치 재고 음수 발생</li>
+                                <li>Cycle Count 오차 허용 범위 초과</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>⚡ Action</h4>
+                            <p><strong>생성형 AI:</strong></p>
+                            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                                <li>작업/이동 이력 시간순 정리</li>
+                                <li>원인 후보 구조화</li>
+                                <li>조사 범위 빠르게 좁히는 분석 제공</li>
+                            </ul>
+                            <p><strong>Agentic AI:</strong></p>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>재실사 작업 자동 생성</li>
+                                <li>보충 우선순위 조정</li>
+                                <li>조건부 출고 중지 또는 대체 위치 피킹 방안 제시</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>🛡️ Guardrail</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>재고조정은 자동화 금지 (승인+이력 관리 전제)</li>
+                                <li>대체출고는 화주 정책 내에서만 제한 허용</li>
+                                <li>기준 불명확 시 확인 절차 우선</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scenario-card" onclick="this.classList.toggle('active')">
+                    <div class="scenario-icon">🔄</div>
+                    <div class="scenario-title">보충 실패</div>
+                    <p style="color: var(--text-secondary);">피킹 위치 재고 부족, 작업 지연</p>
+                    
+                    <div class="scenario-details">
+                        <div class="scenario-section">
+                            <h4>🎯 Trigger</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>피킹 위치 재고가 최소 기준 이하</li>
+                                <li>예상 피킹 수요 미충족</li>
+                                <li>보충 작업 미할당 또는 지연</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>⚡ Action</h4>
+                            <p><strong>생성형 AI:</strong></p>
+                            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                                <li>고갈 원인 요약</li>
+                                <li>우선 보충 대상 품목/위치 설명</li>
+                            </ul>
+                            <p><strong>Agentic AI:</strong></p>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>보충 작업 자동 생성 또는 재할당</li>
+                                <li>우선순위 재계산</li>
+                                <li>대체 피킹 방안 또는 웨이브 순서 조정</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>🛡️ Guardrail</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>대체 피킹/부분출고는 정책상 허용 범위 내에서만</li>
+                                <li>위치 변경 시 이력 관리 필수</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scenario-card" onclick="this.classList.toggle('active')">
+                    <div class="scenario-icon">📤</div>
+                    <div class="scenario-title">출고 오류</div>
+                    <p style="color: var(--text-secondary);">피킹 스캔 불일치, 검증 실패</p>
+                    
+                    <div class="scenario-details">
+                        <div class="scenario-section">
+                            <h4>🎯 Trigger</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>피킹 단계 스캔 불일치</li>
+                                <li>포장 단계 품목 불일치</li>
+                                <li>중량·규격 검증 실패</li>
+                                <li>송장/출고증 생성 불가</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>⚡ Action</h4>
+                            <p><strong>생성형 AI:</strong></p>
+                            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                                <li>예외 유형별 표준화</li>
+                                <li>재처리 절차 요약</li>
+                            </ul>
+                            <p><strong>Agentic AI:</strong></p>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>재작업(Rework) 자동 생성</li>
+                                <li>재피킹 지시</li>
+                                <li>작업 순서 재조정</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>🛡️ Guardrail</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>불일치 미해결 상태 출고 강행은 원칙적으로 금지</li>
+                                <li>재작업 비용/귀책은 원인코드와 함께 기록</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scenario-card" onclick="this.classList.toggle('active')">
+                    <div class="scenario-icon">📦</div>
+                    <div class="scenario-title">포장 부적합</div>
+                    <p style="color: var(--text-secondary);">박스 추천 실패, 규격 초과</p>
+                    
+                    <div class="scenario-details">
+                        <div class="scenario-section">
+                            <h4>🎯 Trigger</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>박스 추천 실패</li>
+                                <li>규격 초과</li>
+                                <li>완충 기준 미준수</li>
+                                <li>고객별·국가별 포장 규격 미충족</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>⚡ Action</h4>
+                            <p><strong>생성형 AI:</strong></p>
+                            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                                <li>예외 원인 분류</li>
+                                <li>대응 방안 설명</li>
+                                <li>반복 예외 품목군 정리</li>
+                            </ul>
+                            <p><strong>Agentic AI:</strong></p>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>대체 박스 작업 지시</li>
+                                <li>분할 출고 지시</li>
+                                <li>기준정보 보정 요청 연결</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>🛡️ Guardrail</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>분할 출고/특수 포장 등 물류비 상승 조치는 승인 기반</li>
+                                <li>파손 위험 높일 수 있으면 보수적 검토 우선</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scenario-card" onclick="this.classList.toggle('active')">
+                    <div class="scenario-icon">🚛</div>
+                    <div class="scenario-title">도크 혼잡 및 마감 위험</div>
+                    <p style="color: var(--text-secondary);">도크 대기, 출고 마감 임박</p>
+                    
+                    <div class="scenario-details">
+                        <div class="scenario-section">
+                            <h4>🎯 Trigger</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>도크 대기 차량 증가</li>
+                                <li>출고 대기 구역 용량 초과</li>
+                                <li>출고 마감 임박 주문 누적</li>
+                                <li>분류기 막힘 (Jam)</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>⚡ Action</h4>
+                            <p><strong>생성형 AI:</strong></p>
+                            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                                <li>병목 발생 지점 빠르게 요약</li>
+                                <li>운영 맥락 정리</li>
+                            </ul>
+                            <p><strong>Agentic AI:</strong></p>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>작업 우선순위 재정렬</li>
+                                <li>임시 완충 위치 할당</li>
+                                <li>작업 순서 조정</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>🛡️ Guardrail</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>우선순위 변경은 SLA/컷오프 등 명시 규칙 기반</li>
+                                <li>안전/설비 관련 조치는 운영자 승인 우선</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scenario-card" onclick="this.classList.toggle('active')">
+                    <div class="scenario-icon">🔙</div>
+                    <div class="scenario-title">반품 처리</div>
+                    <p style="color: var(--text-secondary);">반품 입고, 재판매 가능 여부</p>
+                    
+                    <div class="scenario-details">
+                        <div class="scenario-section">
+                            <h4>🎯 Trigger</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>반품 입고 시 상품 상태 불명확</li>
+                                <li>구성품 누락 여부 확인 필요</li>
+                                <li>반품 사유와 실물 상태 불일치</li>
+                                <li>재판매 가능 여부 판단 필요</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>⚡ Action</h4>
+                            <p><strong>생성형 AI:</strong></p>
+                            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                                <li>반품 사유, 이력, 검수 결과 함께 요약</li>
+                                <li>처리 유형 분류 정리</li>
+                            </ul>
+                            <p><strong>Agentic AI:</strong></p>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>반품 검수 작업 생성</li>
+                                <li>처리 구역 또는 격리 위치 지정</li>
+                                <li>화주 승인 요청 연결</li>
+                            </ul>
+                        </div>
+
+                        <div class="scenario-section">
+                            <h4>🛡️ Guardrail</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                <li>폐기 확정/비용 청구는 자동화 금지</li>
+                                <li>화주별 반품 정책 차이 고려</li>
+                                <li>기준 불명확 시 보류 또는 확인 요청 우선</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(200, 16, 46, 0.1); border-radius: 15px; border-left: 4px solid #C8102E;">
+                <h3 style="margin-bottom: 1rem;">🎯 핵심 요약</h3>
+                <p>물류센터 이슈 대응에서 AI의 가치는 "완전 자율 조치"보다 <strong>이슈를 빠르게 선별(Trigger), 업무를 밀어주고(Action), 위험을 통제(Guardrail)</strong>하는 운영 체계를 만드는 데서 나옵니다.</p>
+            </div>
+        </section>
+
+        <!-- 사전 준비 및 점검 사항 -->
+        <section class="glass-card fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">✅</span>
+                사전 준비 및 점검 사항
+            </h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-secondary);">
+                AI를 물류 이슈 대응에 적용하기 위해서는 기술 자체보다 먼저 준비되어야 할 전제가 있습니다.
+            </p>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">📊</div>
+                    <div class="checklist-content">
+                        <h3>이슈 선정 방식</h3>
+                        <p><strong>영향 기반 선별:</strong> 현장에서 단순히 자주 언급되거나 불만이 많은 문제가 아니라, 실제로 원가, SLA, 클레임, 정산, 재고 정확도에 얼마나 큰 영향을 미치는지를 기준으로 우선순위를 정해야 합니다.</p>
+                        <p style="margin-top: 0.5rem;"><strong>핵심 원칙:</strong> 시끄러운 문제보다 사업적 영향이 큰 문제를 우선적으로 선택하는 것이 중요합니다.</p>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-icon">💾</div>
+                    <div class="checklist-content">
+                        <h3>사실 기반 데이터</h3>
+                        <p>이슈 대응 AI는 추상적인 설명보다 실제 스캔 로그, 작업 이력, 사진, 판정 결과, 승인 기록, 고객 커뮤니케이션과 같은 근거 데이터 위에서 성능이 결정됩니다.</p>
+                        <p style="margin-top: 0.5rem;"><strong>핵심 요구사항:</strong> 단순 결과 라벨보다 "왜 그러한 판단을 하였는지"에 대한 근거와 정책 기준이 함께 남아 있어야 합니다.</p>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-icon">📋</div>
+                    <div class="checklist-content">
+                        <h3>정책 표준화</h3>
+                        <p>화주별 정책과 계약 조건, SLA, 정산 기준을 정리하여 룰 테이블 형태로 관리할 필요가 있습니다.</p>
+                        <p style="margin-top: 0.5rem;"><strong>3PL 특성:</strong> 동일한 이슈라도 화주마다 허용 범위와 대응 방식이 달라질 수 있습니다. 정책이 정리되지 않은 상태에서 AI를 적용하면 판단이 아니라 추정에 의존하게 될 위험이 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-icon">🔄</div>
+                    <div class="checklist-content">
+                        <h3>단계적 자동화</h3>
+                        <p><strong>초기 단계:</strong> 생성형 AI를 중심으로 이슈 요약, 증빙 정리, 표준 문안 생성과 같은 저위험 영역에서 시작</p>
+                        <p><strong>확장 단계:</strong> Agentic AI를 활용하여 태스크 생성, 승인 요청, 상태 추적 등 실행 흐름으로 확장</p>
+                        <p><strong>자동화 단계:</strong> 검증된 범위 내에서 제한적으로 자동 실행을 검토</p>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-icon">🛡️</div>
+                    <div class="checklist-content">
+                        <h3>필수 통제 장치</h3>
+                        <p>모든 이슈 대응 시나리오에는 <strong>사람 개입, 권한 최소화, 감사로그, 승인 체계</strong>가 반드시 포함되어야 합니다.</p>
+                        <p style="margin-top: 0.5rem;"><strong>고위험 조치:</strong> 재고조정, 반송, 폐기, 환불, 출고 강행과 같이 비용과 분쟁 가능성이 큰 조치는 AI가 추천과 준비를 수행하더라도 최종 결정은 사람이 책임지는 구조가 필요합니다.</p>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-icon">⚙️</div>
+                    <div class="checklist-content">
+                        <h3>도입 원칙</h3>
+                        <p>이슈 대응 AI는 <strong>'모델 성능'보다 운영 정책·데이터·프로세스 구조화 수준</strong>이 성패를 가릅니다.</p>
+                        <p style="margin-top: 0.5rem;"><strong>3PL 특화 전략:</strong> 계약과 SLA가 얽혀 있으므로 Trigger–Action–Guardrail 기반의 단계적 적용이 가장 현실적인 성공 경로입니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(255, 99, 132, 0.1); border-radius: 15px; border-left: 4px solid #ff6384;">
+                <h3 style="margin-bottom: 1rem;">⚠️ Gartner 경고: Agentic AI 프로젝트의 높은 실패율</h3>
+                <p style="margin-bottom: 1rem;">Gartner는 2027년 말까지 Agentic AI 프로젝트의 <strong>40% 이상</strong>이 비용 증가, 비즈니스 가치 불명확, 리스크 통제 부족 등으로 취소될 수 있다고 경고했습니다.</p>
+                
+                <p style="margin-bottom: 0.5rem;"><strong>주요 실패 원인:</strong></p>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                    <li>명확한 ROI 부재</li>
+                    <li>통제 구조 미비</li>
+                    <li>데이터 품질 문제</li>
+                    <li>과도한 자동화</li>
+                </ul>
+                
+                <p>이슈 대응은 오탐·오조치가 곧 고객 피해와 비용으로 연결되기 때문에, 초기 목표는 "완전 자율 조치"가 아니라 <strong>"이슈 선별·정리·승인 흐름의 자동화"</strong>처럼 통제 가능한 범위로 설정하는 것이 합리적입니다.</p>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(200, 16, 46, 0.1); border-radius: 15px; border-left: 4px solid #C8102E;">
+                <h3 style="margin-bottom: 1rem;">💡 결론</h3>
+                <p>물류에서 AI를 적용한다는 것은 무엇이든 자동화하는 것이 아니라, <strong>이슈 대응이라는 핵심 경쟁력 영역을 어떤 기준으로 구조화하고, 어떤 범위까지 자동화하며, 어디서부터는 반드시 사람의 판단과 승인을 남길 것인가</strong>를 설계하는 일입니다.</p>
+                <p style="margin-top: 1rem;">이 관점이 분명할 때 AI는 단순한 기술 도입이 아니라, 3PL 운영 역량을 실질적으로 강화하는 도구가 될 수 있습니다.</p>
+            </div>
+        </section>
+
+        <!-- 퀴즈 섹션 -->
+        <section class="glass-card fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">🎯</span>
+                이해도 점검 퀴즈
+            </h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-secondary);">
+                보고서 내용을 얼마나 이해하셨는지 확인해보세요
+            </p>
+
+            <div class="quiz-container" id="quizContainer">
+                <div class="quiz-progress" id="quizProgress">문제 1 / 5</div>
+                <div class="quiz-question" id="quizQuestion"></div>
+                <div class="quiz-options" id="quizOptions"></div>
+                <div class="quiz-controls">
+                    <button class="btn" id="prevBtn" onclick="prevQuestion()" style="display: none;">이전 문제</button>
+                    <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>다음 문제</button>
+                    <button class="btn" id="resultBtn" onclick="showResult()" style="display: none;">결과 보기</button>
+                </div>
+            </div>
+
+            <div class="quiz-result" id="quizResult" style="display: none;">
+                <h2>🎉 퀴즈 완료!</h2>
+                <div class="quiz-score" id="quizScore"></div>
+                <p id="quizFeedback" style="margin-top: 1rem; font-size: 1.2rem;"></p>
+                <button class="btn" onclick="restartQuiz()" style="margin-top: 2rem;">다시 도전하기</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">TDL Trend Report</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">생성형 AI와 Agentic AI 적용 가이드</p>
+            <p style="color: var(--text-secondary);">본 보고서는 3PL 물류센터의 이슈 대응 자동화를 위한 AI 적용 전략을 제시합니다.</p>
+            <p style="margin-top: 2rem; color: var(--text-secondary);">© 2026 All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 퀴즈 데이터
+        const quizData = [
+            {
+                question: "3PL 물류센터에서 이슈 대응이 중요한 이유는 무엇인가요?",
+                options: [
+                    "자동화 설비가 많아서",
+                    "물량 처리 속도가 빠르기 때문에",
+                    "예외 상황의 빈도와 처리 품질이 고객 경험과 손익에 직접적인 영향을 주기 때문에",
+                    "인력 비용을 절감하기 위해서"
+                ],
+                correct: 2
+            },
+            {
+                question: "생성형 AI와 Agentic AI의 핵심 차이점은 무엇인가요?",
+                options: [
+                    "생성형 AI는 텍스트만 처리하고, Agentic AI는 이미지도 처리한다",
+                    "생성형 AI는 무료이고, Agentic AI는 유료이다",
+                    "생성형 AI는 과거 데이터만 사용하고, Agentic AI는 실시간 데이터를 사용한다",
+                    "생성형 AI는 정보 정리·설명 비용을 줄이고, Agentic AI는 업무 진행 비용을 줄인다"
+                ],
+                correct: 3
+            },
+            {
+                question: "Trigger-Action-Guardrail 프레임워크에서 'Guardrail'의 역할은 무엇인가요?",
+                options: [
+                    "AI가 더 빠르게 작업을 수행하도록 가속화한다",
+                    "AI 행동의 경계와 안전장치를 설정하여 오조치 리스크를 통제한다",
+                    "AI가 학습할 데이터를 수집하고 정리한다",
+                    "AI의 성능을 모니터링하고 리포트를 생성한다"
+                ],
+                correct: 1
+            },
+            {
+                question: "AI 발전 단계 중 '도구 사용(Tool use) · 에이전트' 단계의 특징은 무엇인가요?",
+                options: [
+                    "답변을 넘어 단계적으로 '행동'을 실행하며 워크플로우를 자동화한다",
+                    "텍스트와 이미지를 함께 읽고 추론할 수 있다",
+                    "정해진 질문에만 정해진 답을 제공한다",
+                    "사용자 지시를 더 잘 따르고 대화 품질이 안정된다"
+                ],
+                correct: 0
+            },
+            {
+                question: "3PL 물류센터에서 AI 도입 시 가장 중요한 것은 무엇인가요?",
+                options: [
+                    "최신 AI 모델을 사용하는 것",
+                    "AI 비용을 최소화하는 것",
+                    "운영 정책·데이터·프로세스 구조화 수준",
+                    "모든 작업을 완전 자동화하는 것"
+                ],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let score = 0;
+
+        // 퀴즈 초기화
+        function initQuiz() {
+            currentQuestion = 0;
+            userAnswers = [];
+            score = 0;
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('quizResult').style.display = 'none';
+            loadQuestion();
+        }
+
+        // 질문 로드
+        function loadQuestion() {
+            const quiz = quizData[currentQuestion];
+            document.getElementById('quizProgress').textContent = `문제 ${currentQuestion + 1} / ${quizData.length}`;
+            document.getElementById('quizQuestion').textContent = quiz.question;
+            
+            const optionsHtml = quiz.options.map((option, index) => `
+                <div class="quiz-option" onclick="selectOption(${index})">
+                    <span style="font-weight: 700; margin-right: 0.5rem;">❍</span>
+                    <span>${option}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('quizOptions').innerHTML = optionsHtml;
+            
+            // 버튼 상태 업데이트
+            document.getElementById('prevBtn').style.display = currentQuestion > 0 ? 'block' : 'none';
+            document.getElementById('nextBtn').style.display = currentQuestion < quizData.length - 1 ? 'block' : 'none';
+            document.getElementById('resultBtn').style.display = currentQuestion === quizData.length - 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').disabled = userAnswers[currentQuestion] === undefined;
+            
+            // 이전 답변 복원
+            if (userAnswers[currentQuestion] !== undefined) {
+                const options = document.querySelectorAll('.quiz-option');
+                options[userAnswers[currentQuestion]].classList.add('selected');
+            }
+        }
+
+        // 옵션 선택
+        function selectOption(index) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            
+            userAnswers[currentQuestion] = index;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        // 다음 문제
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        // 이전 문제
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        // 결과 표시
+        function showResult() {
+            score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correct) {
+                    score++;
+                }
+            });
+            
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('quizResult').style.display = 'block';
+            document.getElementById('quizScore').textContent = `${score} / ${quizData.length}`;
+            
+            let feedback = '';
+            if (score === quizData.length) {
+                feedback = '훌륭해요! 보고서의 핵심 내용을 완벽하게 이해하셨네요!';
+            } else if (score >= quizData.length * 0.8) {
+                feedback = '잘하셨어요! 대부분의 내용을 잘 이해하고 계시네요!';
+            } else if (score >= quizData.length * 0.6) {
+                feedback = '좋아요! 조금 더 복습하면 완벽할 거예요!';
+            } else {
+                feedback = '보고서를 다시 한번 읽어보시는 것을 추천드려요!';
+            }
+            
+            document.getElementById('quizFeedback').textContent = feedback;
+        }
+
+        // 퀴즈 재시작
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        // 페이지 로드 시 퀴즈 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initQuiz();
+            
+            // 스크롤 애니메이션
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
